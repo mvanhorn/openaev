@@ -437,6 +437,20 @@ public class EndpointService {
       }
     }
     // Save all in database
+    // Add source tag to all endpoints before batch save
+    Executor executor =
+        agentsToSave.stream()
+            .map(Agent::getExecutor)
+            .filter(Objects::nonNull)
+            .findFirst()
+            .orElse(null);
+    if (executor != null) {
+      for (Asset asset : endpointsToSave) {
+        if (asset instanceof Endpoint ep) {
+          addSourceTagToEndpoint(ep, executor);
+        }
+      }
+    }
     assetService.saveAllAssets(endpointsToSave);
     List<Agent> savedAgents = agentService.saveAllAgents(agentsToSave);
     log.info(
@@ -547,14 +561,18 @@ public class EndpointService {
   }
 
   private void addSourceTagToEndpoint(Endpoint endpoint, AgentRegisterInput input) {
+    addSourceTagToEndpoint(endpoint, input.getExecutor());
+  }
+
+  private void addSourceTagToEndpoint(Endpoint endpoint, Executor executor) {
     Set<Tag> existingTags =
         endpoint.getTags() != null ? new HashSet<>(endpoint.getTags()) : new HashSet<>();
     existingTags.removeIf(t -> t.getName() != null && t.getName().startsWith("source:"));
-    String tagName = "source:" + input.getExecutor().getName().toLowerCase();
+    String tagName = "source:" + executor.getName().toLowerCase();
     Optional<Tag> tag = tagRepository.findByName(tagName);
     if (tag.isEmpty()) {
       Tag newTag = new Tag();
-      newTag.setColor(input.getExecutor().getBackgroundColor());
+      newTag.setColor(executor.getBackgroundColor());
       newTag.setName(tagName);
       tagRepository.save(newTag);
       existingTags.add(newTag);
