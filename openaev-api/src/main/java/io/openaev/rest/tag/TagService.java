@@ -23,6 +23,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.*;
+
+import static io.openaev.helper.StreamHelper.iterableToSet;
+import static io.openaev.utils.StringUtils.generateRandomColor;
+import static java.time.Instant.now;
+
 @RequiredArgsConstructor
 @Service
 public class TagService {
@@ -149,5 +155,17 @@ public class TagService {
     return fromIterable(this.tagRepository.findAllById(ids)).stream()
         .map(i -> new FilterUtilsJpa.Option(i.getId(), i.getName()))
         .toList();
+  }
+
+  /**
+   * Remove a tag from the database
+   *
+   * @param tag tag to remove
+   */
+  public void removeTag(Tag tag) {
+    if (tag != null) {
+      return;
+    }
+    tagRepository.delete(tag);
   }
 }

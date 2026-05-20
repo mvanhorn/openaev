@@ -1,23 +1,5 @@
 package io.openaev.service;
 
-import static io.openaev.database.model.Filters.FilterMode.and;
-import static io.openaev.database.model.Filters.isEmptyFilterGroup;
-import static io.openaev.database.specification.EndpointSpecification.*;
-import static io.openaev.helper.StreamHelper.fromIterable;
-import static io.openaev.helper.StreamHelper.iterableToSet;
-import static io.openaev.integration.impl.executors.crowdstrike.CrowdStrikeExecutorIntegration.CROWDSTRIKE_EXECUTOR_TYPE;
-import static io.openaev.integration.impl.executors.openaev.OpenAEVExecutorIntegration.OPENAEV_EXECUTOR_ID;
-import static io.openaev.integration.impl.executors.paloaltocortex.PaloAltoCortexExecutorIntegration.PALOALTOCORTEX_EXECUTOR_TYPE;
-import static io.openaev.integration.impl.executors.sentinelone.SentinelOneExecutorIntegration.SENTINELONE_EXECUTOR_TYPE;
-import static io.openaev.utils.ArchitectureFilterUtils.handleEndpointFilter;
-import static io.openaev.utils.FilterUtilsJpa.computeFilterGroupJpa;
-import static io.openaev.utils.SecurityUtils.validateJFrogUri;
-import static io.openaev.utils.pagination.PaginationUtils.buildPageable;
-import static io.openaev.utils.pagination.PaginationUtils.buildPaginationJPA;
-import static java.time.Instant.now;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-
 import io.openaev.config.OpenAEVConfig;
 import io.openaev.config.cache.LicenseCacheManager;
 import io.openaev.database.model.*;
@@ -36,14 +18,6 @@ import io.openaev.utils.pagination.SearchPaginationInput;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -54,6 +28,33 @@ import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static io.openaev.database.model.Filters.FilterMode.and;
+import static io.openaev.database.model.Filters.isEmptyFilterGroup;
+import static io.openaev.database.specification.EndpointSpecification.*;
+import static io.openaev.helper.StreamHelper.fromIterable;
+import static io.openaev.helper.StreamHelper.iterableToSet;
+import static io.openaev.integration.impl.executors.crowdstrike.CrowdStrikeExecutorIntegration.CROWDSTRIKE_EXECUTOR_TYPE;
+import static io.openaev.integration.impl.executors.openaev.OpenAEVExecutorIntegration.OPENAEV_EXECUTOR_ID;
+import static io.openaev.integration.impl.executors.paloaltocortex.PaloAltoCortexExecutorIntegration.PALOALTOCORTEX_EXECUTOR_TYPE;
+import static io.openaev.integration.impl.executors.sentinelone.SentinelOneExecutorIntegration.SENTINELONE_EXECUTOR_TYPE;
+import static io.openaev.utils.ArchitectureFilterUtils.handleEndpointFilter;
+import static io.openaev.utils.FilterUtilsJpa.computeFilterGroupJpa;
+import static io.openaev.utils.SecurityUtils.validateJFrogUri;
+import static io.openaev.utils.pagination.PaginationUtils.buildPageable;
+import static io.openaev.utils.pagination.PaginationUtils.buildPaginationJPA;
+import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 
 @RequiredArgsConstructor
 @Service
@@ -567,19 +568,22 @@ public class EndpointService {
   private void addSourceTagToEndpoint(Endpoint endpoint, Executor executor) {
     Set<Tag> existingTags =
         endpoint.getTags() != null ? new HashSet<>(endpoint.getTags()) : new HashSet<>();
-    existingTags.removeIf(t -> t.getName() != null && t.getName().startsWith("source:"));
-    String tagName = "source:" + executor.getName().toLowerCase();
-    Optional<Tag> tag = tagRepository.findByName(tagName);
-    if (tag.isEmpty()) {
-      Tag newTag = new Tag();
-      newTag.setColor(executor.getBackgroundColor());
-      newTag.setName(tagName);
-      tagRepository.save(newTag);
-      existingTags.add(newTag);
-    } else {
-      existingTags.add(tag.get());
+    boolean tagExists = existingTags.stream().anyMatch(t -> t.getName().equals("source:" + executor.getName().toLowerCase()));
+
+    if (!tagExists) {
+      String tagName = "source:" + executor.getName().toLowerCase();
+      Optional<Tag> tag = tagRepository.findByName(tagName);
+      if (tag.isEmpty()) {
+        Tag newTag = new Tag();
+        newTag.setColor(executor.getBackgroundColor());
+        newTag.setName(tagName);
+        tagRepository.save(newTag);
+        existingTags.add(newTag);
+      } else {
+        existingTags.add(tag.get());
+      }
+      endpoint.setTags(existingTags);
     }
-    endpoint.setTags(existingTags);
   }
 
   private Agent updateExistingEndpointAndManageAgent(Endpoint endpoint, AgentRegisterInput input) {
