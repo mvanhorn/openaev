@@ -140,7 +140,7 @@ public class ChainingApi extends RestBehavior {
                       new ChainingException(
                           "Simulation is configured for chaining but no workflow template was found"));
 
-      stepService.createStepTemplates(workflow.getId(), List.of(step));
+      stepService.createStepTemplates(workflow, List.of(step));
 
       // Todo return Action, Event and Link
     }
@@ -224,7 +224,7 @@ public class ChainingApi extends RestBehavior {
                       new ChainingException(
                           "Scenario is configured for chaining but no workflow template was found"));
 
-      stepService.createStepTemplates(workflow.getId(), List.of(step));
+      stepService.createStepTemplates(workflow, List.of(step));
       // Todo return Action, Event and Link
     }
   }

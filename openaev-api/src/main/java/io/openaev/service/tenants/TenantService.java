@@ -5,6 +5,7 @@ import static io.openaev.utils.pagination.PaginationUtils.buildPaginationCriteri
 
 import io.openaev.api.tenants.TenantInput;
 import io.openaev.api.tenants.TenantOutput;
+import io.openaev.context.TenantContext;
 import io.openaev.database.model.Tenant;
 import io.openaev.database.repository.TenantRepository;
 import io.openaev.multitenancy.DependenciesManager;
@@ -44,6 +45,14 @@ public class TenantService {
     Objects.requireNonNull(tenant.getName(), "tenant name must not be null");
 
     Tenant createdTenant = tenantRepository.save(tenant);
+
+    // Switch context to the new tenant so that subsequent dependency creation
+    // (domains, roles, etc.) is scoped to the new tenant via Hibernate filter.
+    String newTenantId = createdTenant.getId();
+    TenantContext.setCurrentTenant(newTenantId);
+    org.hibernate.Session session = entityManager.unwrap(org.hibernate.Session.class);
+    session.enableFilter("tenantFilter").setParameter("tenantId", newTenantId);
+
     for (DependenciesManager dependency : sortByPrerequisites(dependencies)) {
       dependency.createDependencyForTenant(createdTenant);
     }

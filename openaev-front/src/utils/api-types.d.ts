@@ -38,6 +38,19 @@ export interface Agent {
   listened?: boolean;
 }
 
+export interface AgentCallInput {
+  /** @minLength 1 */
+  agent_slug: string;
+  /** @minLength 1 */
+  content: string;
+}
+
+export interface AgentCallOutput {
+  content?: string;
+  error?: string;
+  status?: string;
+}
+
 export interface AgentExecutorOutput {
   /** Agent executor id */
   executor_id?: string;
@@ -708,6 +721,11 @@ export interface BrokerConnectionInfo {
   vhost?: string;
 }
 
+export interface CTIEvent {
+  event: Event;
+  internal: Internal;
+}
+
 export interface CVEBulkInsertInput {
   cves: CveCreateInput[];
   initial_dataset_completed?: boolean;
@@ -1018,6 +1036,13 @@ export interface ChannelUpdateLogoInput {
   channel_logo_light?: string;
 }
 
+export interface ChatbotAgentOutput {
+  description?: string;
+  id?: string;
+  name?: string;
+  slug?: string;
+}
+
 export interface CheckExerciseRulesInput {
   /** List of tag that will be applied to the simulation */
   new_tags?: string[];
@@ -1228,7 +1253,7 @@ export interface Condition {
 
 /** Condition used to execute a step. Can be a Template or an Execution depending on the status of stepFrom. */
 export interface ConditionCreateInput {
-  /** Key to be compared */
+  /** Property to be mapped */
   condition_key?: string;
   /** Condition key subtype */
   condition_key_subtype?: "port" | "ipv4" | "ipv6" | "username" | "password";
@@ -1254,6 +1279,9 @@ export interface ConditionCreateInput {
     | "delegation"
     | "sid"
     | "vulnerability"
+    | "account_with_password_not_required"
+    | "asreproastable_account"
+    | "kerberoastable_account"
     | "asset";
   /** Mapping type: DEFAULT, LOCAL, or GLOBAL. Required when condition type is MAPPER, must be null otherwise. */
   condition_mapping_type?: "DEFAULT" | "LOCAL" | "GLOBAL";
@@ -1287,6 +1315,7 @@ export interface ConditionCreateInput {
 
 export interface ConditionOutput {
   condition_id?: string;
+  condition_key?: string;
   condition_key_subtype?: "port" | "ipv4" | "ipv6" | "username" | "password";
   condition_key_type?:
     | "execution_time"
@@ -1309,6 +1338,9 @@ export interface ConditionOutput {
     | "delegation"
     | "sid"
     | "vulnerability"
+    | "account_with_password_not_required"
+    | "asreproastable_account"
+    | "kerberoastable_account"
     | "asset";
   condition_mapping_type?: "DEFAULT" | "LOCAL" | "GLOBAL";
   condition_parent_id?: string;
@@ -1839,6 +1871,14 @@ export interface DetectionRemediation {
 
 export interface DetectionRemediationAIOutput {
   rules?: string;
+}
+
+export interface DetectionRemediationCallInput {
+  agent_slug?: string;
+  /** @minLength 1 */
+  collector_type: string;
+  /** @minLength 1 */
+  content: string;
 }
 
 /** Health check response of the detection/remediation service. */
@@ -2740,6 +2780,11 @@ export interface Evaluation {
 export interface EvaluationInput {
   /** @format int64 */
   evaluation_score?: number;
+}
+
+export interface Event {
+  /** @minLength 1 */
+  stix_objects: string;
 }
 
 export interface EventInput {
@@ -4223,6 +4268,7 @@ export interface InjectorContract {
   injector_contract_manual?: boolean;
   injector_contract_needs_executor?: boolean;
   injector_contract_payload?: Payload;
+  injector_contract_payload_status?: "UNVERIFIED" | "VERIFIED" | "DEPRECATED";
   injector_contract_platforms?: (
     | "Linux"
     | "Windows"
@@ -4513,6 +4559,11 @@ export interface InjectsImportTestInput {
   sheet_name: string;
   /** @format int32 */
   timezone_offset: number;
+}
+
+export interface Internal {
+  /** @minLength 1 */
+  work_id: string;
 }
 
 export interface JsonApiDocumentResourceObject {
@@ -4892,6 +4943,37 @@ export interface LoginUserInput {
   password: string;
   /** The tenant ID the user is logging into (optional) */
   tenantId?: string;
+}
+
+export interface MapperConditionOutput {
+  condition_key?: string;
+  condition_key_type?:
+    | "execution_time"
+    | "step_template_id"
+    | "text"
+    | "status"
+    | "number"
+    | "port"
+    | "portscan"
+    | "ipv4"
+    | "ipv6"
+    | "credentials"
+    | "cve"
+    | "username"
+    | "share"
+    | "admin_username"
+    | "group"
+    | "computer"
+    | "password_policy"
+    | "delegation"
+    | "sid"
+    | "vulnerability"
+    | "account_with_password_not_required"
+    | "asreproastable_account"
+    | "kerberoastable_account"
+    | "asset";
+  condition_mapping_type?: "DEFAULT" | "LOCAL" | "GLOBAL";
+  condition_value?: string;
 }
 
 export interface Mitigation {
@@ -6239,8 +6321,6 @@ export interface PlatformSettings {
     | "STIX_SECURITY_COVERAGE_FOR_VULNERABILITIES"
     | "LEGACY_INGESTION_EXECUTION_TRACE"
     | "MULTI_TENANCY"
-    | "SENTINEL_ONE_EXECUTOR"
-    | "PALO_ALTO_CORTEX_EXECUTOR"
     | "OPENAEV_TRIALS_XTMHUB"
     | "INJECT_CHAINING"
   )[];
@@ -6517,8 +6597,6 @@ export interface PublicPlatformSettings {
     | "STIX_SECURITY_COVERAGE_FOR_VULNERABILITIES"
     | "LEGACY_INGESTION_EXECUTION_TRACE"
     | "MULTI_TENANCY"
-    | "SENTINEL_ONE_EXECUTOR"
-    | "PALO_ALTO_CORTEX_EXECUTOR"
     | "OPENAEV_TRIALS_XTMHUB"
     | "INJECT_CHAINING"
   )[];
@@ -7517,12 +7595,16 @@ export interface StepOutput {
     | "delegation"
     | "sid"
     | "vulnerability"
+    | "account_with_password_not_required"
+    | "asreproastable_account"
+    | "kerberoastable_account"
     | "asset"
   )[];
   /** @format date-time */
   step_created_at?: string;
   step_data?: JsonNode;
   step_id?: string;
+  step_mapper_conditions?: MapperConditionOutput[];
   step_status?: "TEMPLATE" | "READY" | "RUN" | "END";
   /** @format date-time */
   step_updated_at?: string;

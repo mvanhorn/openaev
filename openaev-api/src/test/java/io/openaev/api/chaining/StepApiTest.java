@@ -8,14 +8,13 @@ import static org.mockito.Mockito.*;
 import io.openaev.api.chaining.dto.StepInput;
 import io.openaev.api.chaining.dto.StepOutput;
 import io.openaev.api.chaining.dto.StepsCreateInput;
-import io.openaev.database.model.Step;
-import io.openaev.database.model.StepActionClass;
-import io.openaev.database.model.StepStatus;
+import io.openaev.database.model.*;
 import io.openaev.rest.exception.ChainingException;
 import io.openaev.rest.exception.ElementNotFoundException;
 import io.openaev.rest.settings.PreviewFeature;
 import io.openaev.service.PreviewFeatureService;
 import io.openaev.service.chaining.StepService;
+import io.openaev.service.chaining.WorkflowService;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,30 +29,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class StepApiTest {
 
   @Mock private StepService stepService;
-  @Mock private PreviewFeatureService previewFeatureService;
+  @Mock private WorkflowService workflowService;
 
   @InjectMocks private StepApi stepApi;
 
-  @Nested
-  @DisplayName("When feature flags are enabled")
-  class WhenFlagsEnabled {
+  @Test
+  void given_validInput_should_createStepAndReturnMappedOutput() throws Exception {
+    // Arrange
+    StepInput input = new StepInput();
+    input.setWorkflowId("wf-1");
+    input.setStepAction(StepActionClass.INJECT_EXECUTION);
 
-    @BeforeEach
-    void enableFlags() {
-      when(previewFeatureService.isFeatureEnabled(PreviewFeature.INJECT_CHAINING)).thenReturn(true);
-      when(previewFeatureService.isFeatureEnabled(PreviewFeature.CHAINING_SWIMLANES))
-          .thenReturn(true);
-    }
-
-    @Test
-    void given_validInput_should_createStep() throws Exception {
-      // Arrange
-      StepInput input = new StepInput();
-      input.setWorkflowId("wf-1");
-      input.setStepAction(StepActionClass.INJECT_EXECUTION);
-
-      Step created = step("step-1", 2, StepStatus.TEMPLATE, "{\"a\":1}");
-      when(stepService.createStepTemplate(eq("wf-1"), any(StepsCreateInput.StepInput.class)))
+      Workflow workflow = mock(Workflow.class);
+    when(workflowService.getWorkflowByIdAndStatus("wf-1", WorkflowStatus.TEMPLATE))
+        .thenReturn(workflow);Step created = step("step-1", 2, StepStatus.TEMPLATE, "{\"a\":1}");
+      when(stepService.createStepTemplate(eq(workflow), any(StepsCreateInput.StepInput.class)))
           .thenReturn(created);
 
       // Act
@@ -64,14 +54,14 @@ class StepApiTest {
       assertEquals("step-1", result.getId());
       assertEquals(StepStatus.TEMPLATE, result.getStatus());
       assertEquals("{\"a\":1}", result.getData().toString());
-      verify(stepService).createStepTemplate(eq("wf-1"), any(StepsCreateInput.StepInput.class));
+      verify(stepService).createStepTemplate(eq(workflow), any(StepsCreateInput.StepInput.class));
     }
 
-    @Test
-    void given_validId_should_findById() {
-      // Arrange
-      when(stepService.findStepTemplateById("step-42"))
-          .thenReturn(step("step-42", 1, StepStatus.TEMPLATE, "{}"));
+  @Test
+  void given_stepId_should_findByIdAndReturnMappedStep() {
+    // Arrange
+    when(stepService.findStepTemplateById("step-42"))
+        .thenReturn(step("step-42", 1, StepStatus.TEMPLATE, "{}"));
 
       // Act
       StepOutput result = stepApi.findById("step-42");
@@ -82,11 +72,11 @@ class StepApiTest {
       verify(stepService).findStepTemplateById("step-42");
     }
 
-    @Test
-    void given_workflowId_should_findByWorkflowId() {
-      // Arrange
-      when(stepService.findAllStepTemplateByWorkflow("wf-9"))
-          .thenReturn(List.of(step("s-9", 5, StepStatus.TEMPLATE, "{}")));
+  @Test
+  void given_workflowId_should_findByWorkflowIdAndReturnMappedList() {
+    // Arrange
+    when(stepService.findAllStepTemplateByWorkflow("wf-9"))
+        .thenReturn(List.of(step("s-9", 5, StepStatus.TEMPLATE, "{}")));
 
       // Act
       List<StepOutput> result = stepApi.findByWorkflowId("wf-9");
@@ -97,12 +87,12 @@ class StepApiTest {
       verify(stepService).findAllStepTemplateByWorkflow("wf-9");
     }
 
-    @Test
-    void given_validInput_should_updateStep() throws ChainingException {
-      // Arrange
-      StepInput input = new StepInput();
-      input.setWorkflowId("wf-1");
-      input.setStepAction(StepActionClass.INJECT_EXECUTION);
+  @Test
+  void given_validInput_should_updateStepAndReturnMappedStep() throws ChainingException {
+    // Arrange
+    StepInput input = new StepInput();
+    input.setWorkflowId("wf-1");
+    input.setStepAction(StepActionClass.INJECT_EXECUTION);
 
       when(stepService.updateStepTemplate("s-1", input))
           .thenReturn(step("s-1", 9, StepStatus.TEMPLATE, "{\"updated\":true}"));
@@ -116,10 +106,10 @@ class StepApiTest {
       verify(stepService).updateStepTemplate("s-1", input);
     }
 
-    @Test
-    void given_validId_should_deleteStep() {
-      // Act
-      stepApi.deleteStep("s-del");
+  @Test
+  void given_stepId_should_deleteStep() {
+    // Act
+    stepApi.deleteStep("s-del");
 
       // Assert
       verify(stepService).deleteStepTemplate("s-del");

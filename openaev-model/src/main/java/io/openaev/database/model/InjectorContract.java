@@ -142,6 +142,16 @@ public class InjectorContract implements TenantBase, CompositeIdResolvableI {
     return ofNullable(getPayload()).map(Payload::getExecutionArch).orElse(null);
   }
 
+  @Queryable(
+      filterable = true,
+      path = "payload.status",
+      refEnumClazz = Payload.PAYLOAD_STATUS.class)
+  @JsonProperty("injector_contract_payload_status")
+  @Enumerated(EnumType.STRING)
+  public Payload.PAYLOAD_STATUS getPayloadStatus() {
+    return ofNullable(getPayload()).map(Payload::getStatus).orElse(null);
+  }
+
   @Schema(implementation = String[].class)
   @Getter
   @ManyToMany(fetch = FetchType.EAGER)
@@ -327,7 +337,12 @@ public class InjectorContract implements TenantBase, CompositeIdResolvableI {
   @Queryable(filterable = true, dynamicValues = true, path = "injectors.id")
   private List<String> getInjectorIds() {
     return injectors != null
-        ? new ArrayList<>(injectors.stream().map(Injector::getId).toList())
+        ? new ArrayList<>(
+            injectors.stream()
+                .filter(Objects::nonNull)
+                .map(Injector::getId)
+                .filter(Objects::nonNull)
+                .toList())
         : Collections.emptyList();
   }
 
@@ -336,6 +351,7 @@ public class InjectorContract implements TenantBase, CompositeIdResolvableI {
   private Map<String, String> getInjectorNames() {
     return injectors != null
         ? injectors.stream()
+            .filter(i -> i != null && i.getId() != null && i.getName() != null)
             .collect(
                 Collectors.toMap(
                     Injector::getId, Injector::getName, (a, b) -> a, LinkedHashMap::new))

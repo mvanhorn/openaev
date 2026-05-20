@@ -98,6 +98,7 @@ During `/spec test`, automated security scans run (gitleaks, semgrep, OpenAEV-sp
 |---|---|
 | [add-migration](.github/skills/add-migration/SKILL.md) | Adding a Flyway migration with validation |
 | [add-test](.github/skills/add-test/SKILL.md) | Writing tests with coverage verification |
+| [add-tenant-isolation-test](.github/skills/add-test/TENANT_ISOLATION.md) | Adding tenant isolation tests to API test classes |
 | [create-feature-module](.github/skills/create-feature-module/SKILL.md) | Full feature: entity → API → frontend |
 | [review-performance](.github/skills/review-performance/SKILL.md) | Auditing performance of a PR or module |
 | [review-security](.github/skills/review-security/SKILL.md) | Auditing security of a PR or module |

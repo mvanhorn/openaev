@@ -81,7 +81,7 @@ public class ConditionApi extends RestBehavior {
   @GetMapping(params = "workflow_id")
   public List<EventOutput> findAllByWorkflow(@RequestParam("workflow_id") String workflowId) {
     checkChainingSwimlanesEnabled();
-    return conditionService.findConditionRootsByWorkflowId(workflowId).stream()
+    return conditionService.findNonMapperConditionsByWorkflowId(workflowId).stream()
         .map(ConditionMapper::toOutput)
         .toList();
   }
