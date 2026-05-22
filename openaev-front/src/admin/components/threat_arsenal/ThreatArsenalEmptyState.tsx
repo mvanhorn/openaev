@@ -52,18 +52,22 @@ const ThreatArsenalEmptyState: FunctionComponent<Props> = ({
         }}
         />
       </Box>
-      <Typography variant="h6" sx={{
-        fontWeight: 600,
-        marginBottom: 1,
-      }}
+      <Typography
+        variant="h6"
+        sx={{
+          fontWeight: 600,
+          marginBottom: 1,
+        }}
       >
         {hasFilters ? t('No actions match your filters') : t('Your threat arsenal is empty')}
       </Typography>
-      <Typography variant="body2" sx={{
-        color: 'text.secondary',
-        maxWidth: 420,
-        marginBottom: 3,
-      }}
+      <Typography
+        variant="body2"
+        sx={{
+          color: 'text.secondary',
+          maxWidth: 420,
+          marginBottom: 3,
+        }}
       >
         {hasFilters
           ? t('Try adjusting filters or clearing them to see more actions.')

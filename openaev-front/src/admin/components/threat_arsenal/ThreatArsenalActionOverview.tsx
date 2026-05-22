@@ -7,7 +7,6 @@ import {
   ExpandLessOutlined,
   ExpandMoreOutlined,
   InfoOutlined,
-  LocalOfferOutlined,
   MemoryOutlined,
   TerminalOutlined,
   TuneOutlined,
@@ -28,8 +27,8 @@ import { alpha, useTheme } from '@mui/material/styles';
 import { type FunctionComponent, type ReactNode, useMemo, useState } from 'react';
 
 import { type AttackPatternHelper } from '../../../actions/attack_patterns/attackpattern-helper';
-import type { DocumentHelper } from '../../../actions/helper';
 import type { DomainHelper } from '../../../actions/domains/domain-helper';
+import type { DocumentHelper } from '../../../actions/helper';
 import { useFormatter } from '../../../components/i18n';
 import ItemTags from '../../../components/ItemTags';
 import PlatformIcon from '../../../components/PlatformIcon';
@@ -38,7 +37,6 @@ import {
   type AttackPattern,
   type Command,
   type DnsResolution,
-  type Document,
   type Domain,
   type Executable,
   type FileDrop,
@@ -48,11 +46,10 @@ import {
   type ThreatArsenalAction,
 } from '../../../utils/api-types';
 import { TO_CLASSIFY } from '../../../utils/domains/domainUtils';
-import { copyToClipboard } from '../../../utils/utils';
+import { copyToClipboard, isFeatureEnabled } from '../../../utils/utils';
 import InjectIcon from '../common/injects/InjectIcon';
 import DocumentType from '../components/documents/DocumentType';
 import PayloadStatusComponent from '../payloads/PayloadStatusComponent';
-import { isFeatureEnabled } from '../../../utils/utils';
 
 const STATUS_COLOR_MAP: Record<string, string> = {
   VERIFIED: '#03a847',
@@ -153,7 +150,10 @@ const Section: FunctionComponent<SectionProps> = ({
   );
 };
 
-const Field: FunctionComponent<{ label: string; children: ReactNode }> = ({ label, children }) => {
+const Field: FunctionComponent<{
+  label: string;
+  children: ReactNode;
+}> = ({ label, children }) => {
   const { t } = useFormatter();
   return (
     <Box sx={{
@@ -262,7 +262,10 @@ const CodeBlock: FunctionComponent<CodeBlockProps> = ({ content, language }) => 
   );
 };
 
-const KeyValueChip: FunctionComponent<{ label: string; value: string }> = ({ label, value }) => {
+const KeyValueChip: FunctionComponent<{
+  label: string;
+  value: string;
+}> = ({ label, value }) => {
   const theme = useTheme();
   return (
     <Box
@@ -277,12 +280,14 @@ const KeyValueChip: FunctionComponent<{ label: string; value: string }> = ({ lab
         backgroundColor: alpha(theme.palette.background.paper, 0.4),
       }}
     >
-      <Typography variant="caption" sx={{
-        color: 'text.secondary',
-        fontSize: 11,
-        textTransform: 'uppercase',
-        letterSpacing: '0.04em',
-      }}
+      <Typography
+        variant="caption"
+        sx={{
+          color: 'text.secondary',
+          fontSize: 11,
+          textTransform: 'uppercase',
+          letterSpacing: '0.04em',
+        }}
       >
         {label}
       </Typography>
@@ -541,7 +546,10 @@ const ThreatArsenalActionOverview: FunctionComponent<Props> = ({
       <Section title={t('Overview')} icon={<InfoOutlined fontSize="small" />}>
         <Box sx={{
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' },
+          gridTemplateColumns: {
+            xs: '1fr',
+            md: 'repeat(2, minmax(0, 1fr))',
+          },
           gap: 2,
         }}
         >
@@ -581,25 +589,29 @@ const ThreatArsenalActionOverview: FunctionComponent<Props> = ({
           </Field>
 
           <Field label="Type">
-            {payload?.payload_type
-              ? <KeyValueChip label={t('Type')} value={t(payload.payload_type)} />
-              : action.action_injector_type
-                ? (
-                    <Box sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                    }}
-                    >
-                      <InjectIcon
-                        variant="list"
-                        type={action.action_injector_type}
-                        isPayload={false}
-                      />
-                      <Typography variant="body2">{action.action_injector_type}</Typography>
-                    </Box>
-                  )
-                : <Typography variant="body2" sx={{ color: 'text.disabled' }}>—</Typography>}
+            {(() => {
+              if (payload?.payload_type) {
+                return <KeyValueChip label={t('Type')} value={t(payload.payload_type)} />;
+              }
+              if (!action.action_injector_type) {
+                return <Typography variant="body2" sx={{ color: 'text.disabled' }}>—</Typography>;
+              }
+              return (
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                }}
+                >
+                  <InjectIcon
+                    variant="list"
+                    type={action.action_injector_type}
+                    isPayload={false}
+                  />
+                  <Typography variant="body2">{action.action_injector_type}</Typography>
+                </Box>
+              );
+            })()}
           </Field>
 
           {payload?.payload_execution_arch && (
@@ -743,12 +755,14 @@ const ThreatArsenalActionOverview: FunctionComponent<Props> = ({
 
       {payload && (payload.payload_arguments?.length ?? 0) > 0 && (
         <Section title={t('Arguments')} icon={<TuneOutlined fontSize="small" />}>
-          <Table size="small" sx={{
-            '& .MuiTableCell-root': {
-              fontSize: 12,
-              borderColor: theme.palette.divider,
-            },
-          }}
+          <Table
+            size="small"
+            sx={{
+              '& .MuiTableCell-root': {
+                fontSize: 12,
+                borderColor: theme.palette.divider,
+              },
+            }}
           >
             <TableHead>
               <TableRow>

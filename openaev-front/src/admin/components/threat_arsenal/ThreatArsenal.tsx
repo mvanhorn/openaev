@@ -301,8 +301,9 @@ const ThreatArsenal = () => {
           <Box />
         </Box>
 
-        {loading
-          ? (
+        {(() => {
+          if (loading) {
+            return (
               <Box>
                 {Array.from({ length: 10 }).map((_, idx) => (
                   <Box
@@ -317,42 +318,45 @@ const ThreatArsenal = () => {
                   </Box>
                 ))}
               </Box>
-            )
-          : threatArsenalActions.length === 0
-            ? (
-                <Box sx={{ padding: 4 }}>
-                  <ThreatArsenalEmptyState hasFilters={hasActiveFilters} onResetFilters={handleResetFilters} />
-                </Box>
-              )
-            : (
-                <Box>
-                  {threatArsenalActions.map((action) => {
-                    const flags = computeRowFlags(action);
-                    return (
-                      <Box
-                        key={action.injector_contract_id}
-                        sx={{ borderBottom: `1px solid ${theme.palette.divider}` }}
-                      >
-                        <ThreatArsenalListRow
-                          action={action}
-                          selected={selectedThreatArsenalAction?.injector_contract_id === action.injector_contract_id}
-                          checked={isSelectedAction(action)}
-                          onSelect={() => setSelectedThreatArsenalAction(action)}
-                          onToggleEntity={event => onToggleEntity(action, event)}
-                          onUpdate={(result: ThreatArsenalAction) =>
-                            setThreatArsenalActions(threatArsenalActions.map(a => a.injector_contract_id === action.injector_contract_id ? result : a))}
-                          onDuplicate={(result: ThreatArsenalAction) => setThreatArsenalActions([result, ...threatArsenalActions])}
-                          onDelete={() => setThreatArsenalActions(threatArsenalActions.filter(a => a.injector_contract_id !== action.injector_contract_id))}
-                          disableUpdate={flags.disableUpdate}
-                          disableDuplicate={flags.disableDuplicate}
-                          disableJsonExport={flags.disableJsonExport}
-                          disableDelete={flags.disableDelete}
-                        />
-                      </Box>
-                    );
-                  })}
-                </Box>
-              )}
+            );
+          }
+          if (threatArsenalActions.length === 0) {
+            return (
+              <Box sx={{ padding: 4 }}>
+                <ThreatArsenalEmptyState hasFilters={hasActiveFilters} onResetFilters={handleResetFilters} />
+              </Box>
+            );
+          }
+          return (
+            <Box>
+              {threatArsenalActions.map((action) => {
+                const flags = computeRowFlags(action);
+                return (
+                  <Box
+                    key={action.injector_contract_id}
+                    sx={{ borderBottom: `1px solid ${theme.palette.divider}` }}
+                  >
+                    <ThreatArsenalListRow
+                      action={action}
+                      selected={selectedThreatArsenalAction?.injector_contract_id === action.injector_contract_id}
+                      checked={isSelectedAction(action)}
+                      onSelect={() => setSelectedThreatArsenalAction(action)}
+                      onToggleEntity={event => onToggleEntity(action, event)}
+                      onUpdate={(result: ThreatArsenalAction) =>
+                        setThreatArsenalActions(threatArsenalActions.map(a => a.injector_contract_id === action.injector_contract_id ? result : a))}
+                      onDuplicate={(result: ThreatArsenalAction) => setThreatArsenalActions([result, ...threatArsenalActions])}
+                      onDelete={() => setThreatArsenalActions(threatArsenalActions.filter(a => a.injector_contract_id !== action.injector_contract_id))}
+                      disableUpdate={flags.disableUpdate}
+                      disableDuplicate={flags.disableDuplicate}
+                      disableJsonExport={flags.disableJsonExport}
+                      disableDelete={flags.disableDelete}
+                    />
+                  </Box>
+                );
+              })}
+            </Box>
+          );
+        })()}
       </Box>
     );
   };
@@ -451,11 +455,11 @@ const ThreatArsenal = () => {
                       whiteSpace: 'nowrap',
                     }}
                   >
-                    {numberOfSelectedElements > 0
-                      ? (numberOfSelectedElements === 1
-                          ? t('1 action selected')
-                          : t('{count} actions selected', { count: numberOfSelectedElements }))
-                      : t('Select all')}
+                    {(() => {
+                      if (numberOfSelectedElements === 0) return t('Select all');
+                      if (numberOfSelectedElements === 1) return t('1 action selected');
+                      return t('{count} actions selected', { count: numberOfSelectedElements });
+                    })()}
                   </Typography>
                 )}
                 control={(

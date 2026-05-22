@@ -51,7 +51,9 @@ const ThreatArsenalHero: FunctionComponent<Props> = ({
   }, [searchValue]);
 
   useEffect(() => {
-    if (localSearch === searchValue) return;
+    if (localSearch === searchValue) {
+      return undefined;
+    }
     const handle = window.setTimeout(() => {
       isInternalUpdate.current = true;
       onSearchChange(localSearch);
@@ -66,7 +68,10 @@ const ThreatArsenalHero: FunctionComponent<Props> = ({
       sx={{
         position: 'relative',
         borderRadius: 1,
-        padding: { xs: 1.5, md: 2 },
+        padding: {
+          xs: 1.5,
+          md: 2,
+        },
         overflow: 'hidden',
         border: `1px solid ${theme.palette.divider}`,
         background: `linear-gradient(135deg, ${alpha(primary, 0.06)} 0%, ${alpha(secondary, 0.03)} 60%, transparent 100%)`,
@@ -89,9 +94,15 @@ const ThreatArsenalHero: FunctionComponent<Props> = ({
       <Box sx={{
         position: 'relative',
         display: 'flex',
-        flexDirection: { xs: 'column', md: 'row' },
+        flexDirection: {
+          xs: 'column',
+          md: 'row',
+        },
         gap: 1.5,
-        alignItems: { xs: 'stretch', md: 'center' },
+        alignItems: {
+          xs: 'stretch',
+          md: 'center',
+        },
         justifyContent: 'space-between',
       }}
       >
@@ -108,7 +119,10 @@ const ThreatArsenalHero: FunctionComponent<Props> = ({
             sx={{
               fontWeight: 600,
               margin: 0,
-              fontSize: { xs: 18, md: 20 },
+              fontSize: {
+                xs: 18,
+                md: 20,
+              },
               letterSpacing: '-0.01em',
               whiteSpace: 'nowrap',
             }}
@@ -143,10 +157,12 @@ const ThreatArsenalHero: FunctionComponent<Props> = ({
               >
                 {totalElements}
               </Typography>
-              <Typography variant="caption" sx={{
-                color: 'text.secondary',
-                fontSize: 11,
-              }}
+              <Typography
+                variant="caption"
+                sx={{
+                  color: 'text.secondary',
+                  fontSize: 11,
+                }}
               >
                 {t('total actions')}
               </Typography>
@@ -174,10 +190,12 @@ const ThreatArsenalHero: FunctionComponent<Props> = ({
                 >
                   {stat.value}
                 </Typography>
-                <Typography variant="caption" sx={{
-                  color: 'text.secondary',
-                  fontSize: 11,
-                }}
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'text.secondary',
+                    fontSize: 11,
+                  }}
                 >
                   {t(stat.label)}
                 </Typography>
@@ -192,7 +210,10 @@ const ThreatArsenalHero: FunctionComponent<Props> = ({
             alignItems: 'center',
             gap: 1,
             flexWrap: 'wrap',
-            justifyContent: { xs: 'flex-start', md: 'flex-end' },
+            justifyContent: {
+              xs: 'flex-start',
+              md: 'flex-end',
+            },
             flexShrink: 0,
           }}
           >
@@ -206,7 +227,10 @@ const ThreatArsenalHero: FunctionComponent<Props> = ({
         display: 'flex',
         gap: 1.25,
         marginTop: 1.25,
-        flexWrap: { xs: 'wrap', md: 'nowrap' },
+        flexWrap: {
+          xs: 'wrap',
+          md: 'nowrap',
+        },
         alignItems: 'center',
       }}
       >
@@ -219,7 +243,10 @@ const ThreatArsenalHero: FunctionComponent<Props> = ({
           autoComplete="off"
           sx={{
             'flex': '0 0 auto',
-            'width': { xs: '100%', md: 320 },
+            'width': {
+              xs: '100%',
+              md: 320,
+            },
             '& .MuiOutlinedInput-root': {
               'borderRadius': 1,
               'backgroundColor': alpha(theme.palette.background.paper, 0.8),
