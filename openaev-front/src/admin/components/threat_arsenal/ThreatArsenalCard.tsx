@@ -82,6 +82,7 @@ const ThreatArsenalCard: FunctionComponent<Props> = ({
   return (
     <Card
       variant="outlined"
+      data-testid="threat-arsenal-card"
       sx={{
         'position': 'relative',
         'display': 'flex',
