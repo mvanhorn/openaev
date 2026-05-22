@@ -246,9 +246,9 @@ const ThreatArsenal = () => {
               onSelect={() => setSelectedThreatArsenalAction(action)}
               onToggleEntity={event => onToggleEntity(action, event)}
               onUpdate={(result: ThreatArsenalAction) =>
-                setThreatArsenalActions(threatArsenalActions.map(a => a.injector_contract_id === action.injector_contract_id ? result : a))}
-              onDuplicate={(result: ThreatArsenalAction) => setThreatArsenalActions([result, ...threatArsenalActions])}
-              onDelete={() => setThreatArsenalActions(threatArsenalActions.filter(a => a.injector_contract_id !== action.injector_contract_id))}
+                setThreatArsenalActions(prev => prev.map(a => (a.injector_contract_id === action.injector_contract_id ? result : a)))}
+              onDuplicate={(result: ThreatArsenalAction) => setThreatArsenalActions(prev => [result, ...prev])}
+              onDelete={() => setThreatArsenalActions(prev => prev.filter(a => a.injector_contract_id !== action.injector_contract_id))}
               disableUpdate={flags.disableUpdate}
               disableDuplicate={flags.disableDuplicate}
               disableJsonExport={flags.disableJsonExport}
@@ -343,9 +343,9 @@ const ThreatArsenal = () => {
                       onSelect={() => setSelectedThreatArsenalAction(action)}
                       onToggleEntity={event => onToggleEntity(action, event)}
                       onUpdate={(result: ThreatArsenalAction) =>
-                        setThreatArsenalActions(threatArsenalActions.map(a => a.injector_contract_id === action.injector_contract_id ? result : a))}
-                      onDuplicate={(result: ThreatArsenalAction) => setThreatArsenalActions([result, ...threatArsenalActions])}
-                      onDelete={() => setThreatArsenalActions(threatArsenalActions.filter(a => a.injector_contract_id !== action.injector_contract_id))}
+                        setThreatArsenalActions(prev => prev.map(a => (a.injector_contract_id === action.injector_contract_id ? result : a)))}
+                      onDuplicate={(result: ThreatArsenalAction) => setThreatArsenalActions(prev => [result, ...prev])}
+                      onDelete={() => setThreatArsenalActions(prev => prev.filter(a => a.injector_contract_id !== action.injector_contract_id))}
                       disableUpdate={flags.disableUpdate}
                       disableDuplicate={flags.disableDuplicate}
                       disableJsonExport={flags.disableJsonExport}
@@ -466,9 +466,12 @@ const ThreatArsenal = () => {
                   <Checkbox
                     size="small"
                     checked={selectAll}
-                    indeterminate={!selectAll && numberOfSelectedElements > 0}
+                    indeterminate={
+                      (!selectAll && numberOfSelectedElements > 0)
+                      || (selectAll && Object.keys(deSelectedElements ?? {}).length > 0)
+                    }
                     onChange={handleToggleSelectAll}
-                    disabled={typeof handleToggleSelectAll !== 'function' || threatArsenalActions.length === 0}
+                    disabled={threatArsenalActions.length === 0}
                   />
                 )}
                 sx={{
@@ -487,7 +490,7 @@ const ThreatArsenal = () => {
       <Can I={ACTIONS.MANAGE} a={SUBJECTS.THREAT_ARSENALS}>
         <CreateThreatArsenalAction
           onCreate={(result: ThreatArsenalAction) => {
-            setThreatArsenalActions([result, ...threatArsenalActions]);
+            setThreatArsenalActions(prev => [result, ...prev]);
           }}
         />
       </Can>

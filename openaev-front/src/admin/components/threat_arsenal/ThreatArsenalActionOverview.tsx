@@ -50,18 +50,7 @@ import { copyToClipboard, isFeatureEnabled } from '../../../utils/utils';
 import InjectIcon from '../common/injects/InjectIcon';
 import DocumentType from '../components/documents/DocumentType';
 import PayloadStatusComponent from '../payloads/PayloadStatusComponent';
-
-const STATUS_COLOR_MAP: Record<string, string> = {
-  VERIFIED: '#03a847',
-  UNVERIFIED: '#ffa726',
-  DEPRECATED: '#7A7C85',
-};
-
-const STATUS_LABEL_MAP: Record<string, string> = {
-  VERIFIED: 'Verified',
-  UNVERIFIED: 'Unverified',
-  DEPRECATED: 'Deprecated',
-};
+import { getStatusColor, getStatusLabel } from './threatArsenalStatusUtils';
 
 interface SectionProps {
   title: string;
@@ -341,8 +330,8 @@ const ThreatArsenalActionOverview: FunctionComponent<Props> = ({
   const primaryDomain = domains[0];
   const accent = primaryDomain?.domain_color ?? theme.palette.primary.main;
   const status = action.action_payload?.payload_status ?? payload?.payload_status;
-  const statusColor = status ? STATUS_COLOR_MAP[status] : undefined;
-  const statusLabel = status ? STATUS_LABEL_MAP[status] : null;
+  const statusColor = status ? getStatusColor(theme, status) : undefined;
+  const statusLabel = getStatusLabel(status);
   const name = tPick(action.action_labels);
   const description = payload?.payload_description ?? '';
   const platforms = payload?.payload_platforms ?? action.action_platforms ?? [];

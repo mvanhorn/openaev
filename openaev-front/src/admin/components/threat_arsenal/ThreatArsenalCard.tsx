@@ -12,18 +12,7 @@ import { type Domain, type ThreatArsenalAction } from '../../../utils/api-types'
 import { TO_CLASSIFY } from '../../../utils/domains/domainUtils';
 import InjectIcon from '../common/injects/InjectIcon';
 import ThreatArsenalActionPopover from './ThreatArsenalActionPopover';
-
-const STATUS_COLOR_MAP: Record<string, string> = {
-  VERIFIED: '#03a847',
-  UNVERIFIED: '#ffa726',
-  DEPRECATED: '#7A7C85',
-};
-
-const STATUS_LABEL_MAP: Record<string, string> = {
-  VERIFIED: 'Verified',
-  UNVERIFIED: 'Unverified',
-  DEPRECATED: 'Deprecated',
-};
+import { getStatusColor, getStatusLabel } from './threatArsenalStatusUtils';
 
 interface Props {
   action: ThreatArsenalAction;
@@ -73,8 +62,8 @@ const ThreatArsenalCard: FunctionComponent<Props> = ({
   const primaryDomain = domains[0];
   const accent = primaryDomain?.domain_color ?? theme.palette.primary.main;
   const status = action.action_payload?.payload_status;
-  const statusColor = status ? STATUS_COLOR_MAP[status] : theme.palette.text.disabled;
-  const statusLabel = status ? STATUS_LABEL_MAP[status] : null;
+  const statusColor = getStatusColor(theme, status);
+  const statusLabel = getStatusLabel(status);
   const name = tPick(action.action_labels);
 
   const showCheckbox = anySelected || selected || checked;

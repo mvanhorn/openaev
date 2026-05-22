@@ -57,19 +57,32 @@ const ThreatArsenalInformationDrawer: FunctionComponent<Props> = ({
 
   useEffect(() => {
     if (!open || !threatArsenalAction) {
-      return;
+      return undefined;
     }
 
     setSelectedPayload(null);
 
     if (!threatArsenalAction.action_payload) {
-      return;
+      return undefined;
     }
     setLoading(true);
-    fetchThreatArsenalAction(threatArsenalAction.injector_contract_id).then((result) => {
-      setSelectedPayload(toPayload(result.data as ThreatArsenalActionFullOutput));
-      setLoading(false);
-    });
+    let cancelled = false;
+    fetchThreatArsenalAction(threatArsenalAction.injector_contract_id)
+      .then((result) => {
+        if (cancelled) return;
+        setSelectedPayload(toPayload(result.data as ThreatArsenalActionFullOutput));
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setSelectedPayload(null);
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [open, threatArsenalAction]);
 
   return (
