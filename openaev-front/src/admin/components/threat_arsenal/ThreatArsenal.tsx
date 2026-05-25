@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import type { DomainHelper } from '../../../actions/domains/domain-helper';
 import {
@@ -111,31 +111,12 @@ const ThreatArsenal = () => {
     domainFilterKey: 'action_domains',
   });
 
-  const stats = useMemo(() => {
-    const verified = threatArsenalActions.filter(a => a.action_payload?.payload_status === 'VERIFIED').length;
-    const unverified = threatArsenalActions.filter(a => a.action_payload?.payload_status === 'UNVERIFIED').length;
-    const deprecated = threatArsenalActions.filter(a => a.action_payload?.payload_status === 'DEPRECATED').length;
-    return [
-      {
-        id: 'verified',
-        label: 'Verified',
-        value: verified,
-        color: theme.palette.success.main,
-      },
-      {
-        id: 'unverified',
-        label: 'Unverified',
-        value: unverified,
-        color: theme.palette.warning.main,
-      },
-      {
-        id: 'deprecated',
-        label: 'Deprecated',
-        value: deprecated,
-        color: theme.palette.text.disabled,
-      },
-    ];
-  }, [threatArsenalActions, theme]);
+  // Per-status counts are intentionally NOT computed from `threatArsenalActions`
+  // here: that array only holds the currently loaded page, while `totalElements`
+  // covers the full filtered dataset, so page-bound counts would be misleading
+  // (e.g. "Verified: 23" on page 1, "Verified: 8" on page 2). Users can drill
+  // by status via the Status quick filter underneath the hero. If a global
+  // aggregation endpoint is ever added, status chips can be wired here.
 
   const availableFilterNames = [
     'action_injectors',
@@ -422,7 +403,7 @@ const ThreatArsenal = () => {
         <ThreatArsenalHero
           totalElements={totalElements}
           domainElements={iconBarOrderedDomains}
-          stats={stats}
+          stats={[]}
           searchValue={searchPaginationInput.textSearch ?? ''}
           onSearchChange={value => queryableHelpers.textSearchHelpers.handleTextSearch(value)}
           rightSlot={headerRightSlot}

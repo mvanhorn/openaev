@@ -56,13 +56,20 @@ const ThreatArsenalInformationDrawer: FunctionComponent<Props> = ({
   const [selectedPayload, setSelectedPayload] = useState<Payload | null>(null);
 
   useEffect(() => {
+    // Reset both states on every (re)entry so a previous in-flight fetch
+    // whose `.finally()` was skipped by the cancellation guard can't leave
+    // the drawer stuck on a spinner when the next opened action has no
+    // payload (early return paths below).
     if (!open || !threatArsenalAction) {
+      setLoading(false);
+      setSelectedPayload(null);
       return undefined;
     }
 
     setSelectedPayload(null);
 
     if (!threatArsenalAction.action_payload) {
+      setLoading(false);
       return undefined;
     }
     setLoading(true);
@@ -77,6 +84,8 @@ const ThreatArsenalInformationDrawer: FunctionComponent<Props> = ({
         setSelectedPayload(null);
       })
       .finally(() => {
+        // Keep the cancellation guard so a stale finally from a superseded
+        // fetch can't clear the spinner of a newer in-flight fetch.
         if (cancelled) return;
         setLoading(false);
       });

@@ -62,7 +62,18 @@ const ThreatArsenalListRow: FunctionComponent<Props> = ({
   return (
     <Box
       role="row"
+      tabIndex={0}
+      aria-selected={selected}
       onClick={onSelect}
+      onKeyDown={(event) => {
+        // Mirror the click behaviour for keyboard users so list view stays
+        // operable without a mouse. Space/Enter scroll the page by default,
+        // so prevent that explicitly.
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onSelect();
+        }
+      }}
       sx={{
         'display': 'grid',
         'gridTemplateColumns': '40px 44px minmax(0, 2fr) minmax(0, 1.2fr) 120px 130px 120px 160px 48px',
@@ -77,6 +88,10 @@ const ThreatArsenalListRow: FunctionComponent<Props> = ({
         'backgroundColor': selected ? alpha(accent, 0.08) : 'transparent',
         'transition': theme.transitions.create(['background-color', 'border-color']),
         '&:hover': { backgroundColor: alpha(theme.palette.text.primary, 0.04) },
+        '&:focus-visible': {
+          outline: `2px solid ${theme.palette.primary.main}`,
+          outlineOffset: -2,
+        },
       }}
     >
       <Box
