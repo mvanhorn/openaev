@@ -940,7 +940,9 @@ public class InjectExpectationService {
     }
 
     for (InjectExpectation expectation : expectations) {
-      selfProvider.getObject().applySignaturesForExpectationWithLock(expectation.getId(), signatures);
+      selfProvider
+          .getObject()
+          .applySignaturesForExpectationWithLock(expectation.getId(), signatures);
     }
   }
 
