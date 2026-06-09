@@ -13,6 +13,8 @@ import static io.openaev.utils.inject_expectation_result.ExpectationResultBuilde
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.openaev.aop.lock.Lock;
+import io.openaev.aop.lock.LockResourceType;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.InjectExpectationRepository;
 import io.openaev.database.specification.InjectExpectationSpecification;
@@ -42,11 +44,13 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -61,6 +65,7 @@ public class InjectExpectationService {
   private final CollectorService collectorService;
   @Resource private ExpectationPropertiesConfig expectationPropertiesConfig;
   private final SecurityCoverageSendJobService securityCoverageSendJobService;
+  @Resource private ObjectProvider<InjectExpectationService> selfProvider;
 
   @Resource protected ObjectMapper mapper;
 
@@ -518,11 +523,10 @@ public class InjectExpectationService {
 
     return injectExpectationRepository
         .findAll(
-            Specification.where(
-                InjectExpectationSpecification.type(type)
-                    .and(InjectExpectationSpecification.agentNotNull())
-                    .and(InjectExpectationSpecification.assetNotNull())
-                    .and(InjectExpectationSpecification.from(expirationThreshold))))
+            InjectExpectationSpecification.type(type)
+                .and(InjectExpectationSpecification.agentNotNull())
+                .and(InjectExpectationSpecification.assetNotNull())
+                .and(InjectExpectationSpecification.from(expirationThreshold)))
         .stream()
         .filter(ExpectationUtils::isAgentExpectation)
         .filter(e -> hasNoResult(e.getResults(), sourceId))
@@ -543,11 +547,10 @@ public class InjectExpectationService {
 
     return injectExpectationRepository
         .findAll(
-            Specification.where(
-                InjectExpectationSpecification.type(type)
-                    .and(InjectExpectationSpecification.agentNotNull())
-                    .and(InjectExpectationSpecification.assetNotNull())
-                    .and(InjectExpectationSpecification.from(expirationThreshold))))
+            InjectExpectationSpecification.type(type)
+                .and(InjectExpectationSpecification.agentNotNull())
+                .and(InjectExpectationSpecification.assetNotNull())
+                .and(InjectExpectationSpecification.from(expirationThreshold)))
         .stream()
         .filter(ExpectationUtils::isAgentExpectation)
         .filter(e -> hasNoResults(e.getResults()))
@@ -886,6 +889,94 @@ public class InjectExpectationService {
     injectExpectationAgentOutputs.sort(
         Comparator.comparing(InjectExpectationAgentOutput::getAgentName));
     return injectExpectationAgentOutputs;
+  }
+
+  // -- STRUCTURED OUTPUT SIGNATURES --
+
+  /**
+   * Applies signatures emitted by structured output on matching technical expectations.
+   *
+   * <p>The target is resolved using this priority: agent, then asset, then asset group.
+   *
+   * <p>If signatures were never initialized for an expectation, existing signatures are cleared
+   * once, then new signatures are appended. Otherwise, signatures are only appended.
+   *
+   * @param injectId the inject ID
+   * @param agentId optional agent ID target
+   * @param assetId optional asset ID target
+   * @param assetGroupId optional asset group ID target
+   * @param expectationType the expectation type (DETECTION or PREVENTION)
+   * @param signatures signatures to append
+   */
+  public void applySignaturesFromStructuredOutput(
+      @NotBlank String injectId,
+      @Nullable String agentId,
+      @Nullable String assetId,
+      @Nullable String assetGroupId,
+      @NotNull InjectExpectation.EXPECTATION_TYPE expectationType,
+      @NotNull List<InjectExpectationSignature> signatures) {
+    if (signatures.isEmpty()) {
+      return;
+    }
+    if (!List.of(DETECTION, PREVENTION).contains(expectationType)) {
+      throw new IllegalArgumentException(
+          "Signature structured output is only supported for DETECTION and PREVENTION expectations");
+    }
+
+    List<InjectExpectation> expectations =
+        findTechnicalExpectationsForTarget(injectId, agentId, assetId, assetGroupId).stream()
+            .filter(expectation -> expectationType == expectation.getType())
+            .toList();
+
+    if (expectations.isEmpty()) {
+      log.warn(
+          "No inject expectation found for structured signatures (injectId={}, agentId={}, assetId={}, assetGroupId={}, expectationType={})",
+          injectId,
+          agentId,
+          assetId,
+          assetGroupId,
+          expectationType);
+      return;
+    }
+
+    for (InjectExpectation expectation : expectations) {
+      selfProvider.getObject().applySignaturesForExpectationWithLock(expectation.getId(), signatures);
+    }
+  }
+
+  @Lock(type = LockResourceType.INJECT_EXPECTATION, key = "#expectationId")
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void applySignaturesForExpectationWithLock(
+      @NotBlank String expectationId, @NotNull List<InjectExpectationSignature> signatures) {
+    InjectExpectation expectation = findInjectExpectation(expectationId);
+    if (!expectation.isSignaturesInitialized()) {
+      injectExpectationRepository.clearSignaturesAndMarkInitialized(expectation.getId());
+    }
+
+    signatures.stream()
+        .filter(Objects::nonNull)
+        .filter(signature -> signature.getType() != null && signature.getValue() != null)
+        .forEach(
+            signature ->
+                injectExpectationRepository.appendSignature(
+                    expectation.getId(), signature.getType(), signature.getValue()));
+  }
+
+  private List<InjectExpectation> findTechnicalExpectationsForTarget(
+      @NotBlank String injectId,
+      @Nullable String agentId,
+      @Nullable String assetId,
+      @Nullable String assetGroupId) {
+    if (agentId != null) {
+      return injectExpectationRepository.findAllByInjectAndAgent(injectId, agentId);
+    }
+    if (assetId != null) {
+      return injectExpectationRepository.findAllByInjectAndAsset(injectId, assetId);
+    }
+    if (assetGroupId != null) {
+      return injectExpectationRepository.findAllByInjectAndAssetGroup(injectId, assetGroupId);
+    }
+    return Collections.emptyList();
   }
 
   /**
