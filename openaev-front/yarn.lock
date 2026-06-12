@@ -1668,15 +1668,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@filigran/chatbot@npm:3.3.5":
-  version: 3.3.5
-  resolution: "@filigran/chatbot@npm:3.3.5"
+"@filigran/chatbot@npm:3.6.1":
+  version: 3.6.1
+  resolution: "@filigran/chatbot@npm:3.6.1"
   peerDependencies:
     react: ">=18"
     react-dom: ">=18"
     react-markdown: ">=10"
     remark-gfm: ">=4"
-  checksum: 10c0/d11a09a7037311708025bc92282ffbf603008f906cc02e1467ef4c542db811e89c7381eba7b0d9105c1c2c320bd95711668a427617cfdb676379e498c6dadfdc
+  checksum: 10c0/420ca59e54fe3a175d439ce1436bcd1c12d479ae0f9622539a4bb2827c9026fbc437088302b50c217af40e410d367b17c90965cb67ac6bc1301647d9443cf476
   languageName: node
   linkType: hard
 
@@ -2297,13 +2297,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/x-date-pickers@npm:8.28.7":
-  version: 8.28.7
-  resolution: "@mui/x-date-pickers@npm:8.28.7"
+"@mui/x-date-pickers@npm:8.29.0":
+  version: 8.29.0
+  resolution: "@mui/x-date-pickers@npm:8.29.0"
   dependencies:
     "@babel/runtime": "npm:^7.28.4"
     "@mui/utils": "npm:^7.3.5"
-    "@mui/x-internals": "npm:8.26.0"
+    "@mui/x-internals": "npm:8.29.0"
     "@types/react-transition-group": "npm:^4.4.12"
     clsx: "npm:^2.1.1"
     prop-types: "npm:^15.8.1"
@@ -2341,13 +2341,13 @@ __metadata:
       optional: true
     moment-jalaali:
       optional: true
-  checksum: 10c0/b0d9cb2013c62fde772df5c3069c06499c837275d987723086ec31f641ac30ddd43cceef7bb12d7b604894e522c05b5744283664f9cbf30bcc2e2b84cadfdc0c
+  checksum: 10c0/23854a3a666fc8fac84c036c27123c9a06d6fb6fef96dfd52caf8391e96bd391fea38602fa3c8d9baff19fcfb2a6163b0a98358f31115e9b19ad452ca993e265
   languageName: node
   linkType: hard
 
-"@mui/x-internals@npm:8.26.0":
-  version: 8.26.0
-  resolution: "@mui/x-internals@npm:8.26.0"
+"@mui/x-internals@npm:8.29.0":
+  version: 8.29.0
+  resolution: "@mui/x-internals@npm:8.29.0"
   dependencies:
     "@babel/runtime": "npm:^7.28.4"
     "@mui/utils": "npm:^7.3.5"
@@ -2355,7 +2355,7 @@ __metadata:
     use-sync-external-store: "npm:^1.6.0"
   peerDependencies:
     react: ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/819564e1b1c7626f5e237edd81f716a3871df1479f2e2e9fbef45a5963df21c510eca4931f6af726fdcd9dc643a019e44c5d61657865b389ef0a2ab5abb10d6c
+  checksum: 10c0/7dd84c45084404426ec46dd20976ba81cceeb84011be900c07c1f02131fa8fb26049b5974577457552c78c24153b57e0b79c85f8eddca8c3a550ea837529eb74
   languageName: node
   linkType: hard
 
@@ -4464,6 +4464,15 @@ __metadata:
   dependencies:
     base64-js: "npm:^1.1.2"
   checksum: 10c0/9d24e24f8b7eabf44af034ed5f7d5530008b835f09a107a84ac060723e86dd43c6aa68958691fe5df524f59473b35f5ce2e0854aa1152c0a254d1010f51bcf22
+  languageName: node
+  linkType: hard
+
+"browserify-zlib@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "browserify-zlib@npm:0.2.0"
+  dependencies:
+    pako: "npm:~1.0.5"
+  checksum: 10c0/9ab10b6dc732c6c5ec8ebcbe5cb7fe1467f97402c9b2140113f47b5f187b9438f93a8e065d8baf8b929323c18324fbf1105af479ee86d9d36cab7d7ef3424ad9
   languageName: node
   linkType: hard
 
@@ -7454,9 +7463,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"http-proxy-middleware@npm:3.0.5":
-  version: 3.0.5
-  resolution: "http-proxy-middleware@npm:3.0.5"
+"http-proxy-middleware@npm:3.0.6":
+  version: 3.0.6
+  resolution: "http-proxy-middleware@npm:3.0.6"
   dependencies:
     "@types/http-proxy": "npm:^1.17.15"
     debug: "npm:^4.3.6"
@@ -7464,7 +7473,7 @@ __metadata:
     is-glob: "npm:^4.0.3"
     is-plain-object: "npm:^5.0.0"
     micromatch: "npm:^4.0.8"
-  checksum: 10c0/89ff3c8fe65b22b8042a6173ae1b8f77c5171f7eecf3c8b5d6dcffe3c9d688acae7bcf498cc08d1525f566dc0781efaec4e2ddc49224b1f16f020de7987a446b
+  checksum: 10c0/50c76da35e0695dba3e6110d5ca21e65718a1f7478f5c35cf2e9aa13b2d5f9b163f15312ce7f15a0d3d706ed40c9e6037a6fbba33ec44431698578b1d4875e41
   languageName: node
   linkType: hard
 
@@ -9851,7 +9860,7 @@ __metadata:
     "@emotion/styled": "npm:11.14.1"
     "@eslint/js": "npm:9.39.4"
     "@faker-js/faker": "npm:10.4.0"
-    "@filigran/chatbot": "npm:3.3.5"
+    "@filigran/chatbot": "npm:3.6.1"
     "@fontsource/geologica": "npm:5.2.8"
     "@fontsource/ibm-plex-sans": "npm:5.2.8"
     "@hello-pangea/dnd": "npm:18.0.1"
@@ -9861,7 +9870,7 @@ __metadata:
     "@mui/lab": "npm:7.0.0-beta.17"
     "@mui/material": "npm:7.3.11"
     "@mui/system": "npm:7.3.11"
-    "@mui/x-date-pickers": "npm:8.28.7"
+    "@mui/x-date-pickers": "npm:8.29.0"
     "@playwright/test": "npm:1.60.0"
     "@redux-devtools/extension": "npm:4.0.0"
     "@stylistic/eslint-plugin": "npm:5.10.0"
@@ -9911,7 +9920,7 @@ __metadata:
     happy-dom: "npm:^20.8.9"
     html-react-parser: "npm:6.1.3"
     html-to-image: "npm:1.11.13"
-    http-proxy-middleware: "npm:3.0.5"
+    http-proxy-middleware: "npm:3.0.6"
     i18n-auto-translation: "npm:2.2.3"
     immutable: "npm:5.1.6"
     ipaddr.js: "npm:^2.2.0"
@@ -9923,7 +9932,7 @@ __metadata:
     monocart-coverage-reports: "npm:2.12.11"
     monocart-reporter: "npm:2.11.2"
     normalizr: "npm:3.6.2"
-    pdfmake: "npm:0.3.9"
+    pdfmake: "npm:0.3.10"
     prop-types: "npm:15.8.1"
     qs: "npm:6.15.2"
     ramda: "npm:0.32.0"
@@ -9935,8 +9944,8 @@ __metadata:
     react-final-form: "npm:6.5.9"
     react-final-form-arrays: "npm:4.0.0"
     react-grid-layout: "npm:2.2.3"
-    react-hook-form: "npm:7.77.0"
-    react-intl: "npm:10.1.12"
+    react-hook-form: "npm:7.78.0"
+    react-intl: "npm:10.1.13"
     react-markdown: "npm:10.1.0"
     react-redux: "npm:9.3.0"
     react-router: "npm:7.17.0"
@@ -10028,6 +10037,13 @@ __metadata:
   version: 0.2.9
   resolution: "pako@npm:0.2.9"
   checksum: 10c0/79c1806ebcf325b60ae599e4d7227c2e346d7b829dc20f5cf24cef07c934079dc3a61c5b3c8278a2f7a190c4a613e343ea11e5302dbe252efd11712df4b6b041
+  languageName: node
+  linkType: hard
+
+"pako@npm:~1.0.5":
+  version: 1.0.11
+  resolution: "pako@npm:1.0.11"
+  checksum: 10c0/86dd99d8b34c3930345b8bbeb5e1cd8a05f608eeb40967b293f72fe469d0e9c88b783a8777e4cc7dc7c91ce54c5e93d88ff4b4f060e6ff18408fd21030d9ffbe
   languageName: node
   linkType: hard
 
@@ -10152,28 +10168,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pdfkit@npm:^0.18.0":
-  version: 0.18.0
-  resolution: "pdfkit@npm:0.18.0"
+"pdfkit@npm:^0.19.0":
+  version: 0.19.0
+  resolution: "pdfkit@npm:0.19.0"
   dependencies:
     "@noble/ciphers": "npm:^1.0.0"
     "@noble/hashes": "npm:^1.6.0"
     fontkit: "npm:^2.0.4"
     js-md5: "npm:^0.8.3"
     linebreak: "npm:^1.1.0"
-    png-js: "npm:^1.0.0"
-  checksum: 10c0/09a0e2eb704269603db397a199bcbb0bcae90e3e4a548b5f5009acf8baefb237a6adf524146805d10e96ed53abac34f7db4f534fdfc870c93a72d967660624ae
+    png-js: "npm:^1.1.0"
+  checksum: 10c0/45aca68c1e69104937a5762b4ecff4ef1ce14534e3d46748db37d3bfb2dfe3e0363c4c347f896f7e41833084daf5e43c3777ef902968469acb772832e0901cc9
   languageName: node
   linkType: hard
 
-"pdfmake@npm:0.3.9":
-  version: 0.3.9
-  resolution: "pdfmake@npm:0.3.9"
+"pdfmake@npm:0.3.10":
+  version: 0.3.10
+  resolution: "pdfmake@npm:0.3.10"
   dependencies:
     linebreak: "npm:^1.1.0"
-    pdfkit: "npm:^0.18.0"
+    pdfkit: "npm:^0.19.0"
     xmldoc: "npm:^2.0.3"
-  checksum: 10c0/2a7ef5fb2f1dd9a8f0fb28e06f3f7714aaa2383b549742dc72f216aeeb12f928f06a3c5d8e31696e72676340e796e5c7ee2a5ab9cf5d50be2c0ff4ff3803729c
+  checksum: 10c0/d7a64a017102db3b325644346b83f7eda744c4019f3bbcbd9bea76722cfc7d3682d0a915bd99cc8acf815293d061c3d96d0fbf2ebfff4be4d60a5266f67f0324
   languageName: node
   linkType: hard
 
@@ -10240,10 +10256,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"png-js@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "png-js@npm:1.0.0"
-  checksum: 10c0/b591107bb888c66cb1799327774f73f2865a366b5992ed7335c81610eab0e9cb4f13fb396e3c00e28781ada6ccde170b566209e9df833a2abe71d11da55aea85
+"png-js@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "png-js@npm:1.1.0"
+  dependencies:
+    browserify-zlib: "npm:^0.2.0"
+  checksum: 10c0/61e275cb424b914fbc01c2a1b0096857f214c5fee45054c713dec1ad320760f4dd61f28bb0b3b0c139bd8c49def8891b02ca4018238e7b5f14bb671cd1ca7874
   languageName: node
   linkType: hard
 
@@ -10568,18 +10586,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hook-form@npm:7.77.0":
-  version: 7.77.0
-  resolution: "react-hook-form@npm:7.77.0"
+"react-hook-form@npm:7.78.0":
+  version: 7.78.0
+  resolution: "react-hook-form@npm:7.78.0"
   peerDependencies:
     react: ^16.8.0 || ^17 || ^18 || ^19
-  checksum: 10c0/b61c9d739cf0fb4fde235cf1e36ae7bb69a583acbf144c9a1e403b47a0406bef5418cc0deb432b0b7e3e50738a998c5c44fad50aa881d85e5233b66c7a67d868
+  checksum: 10c0/53835398cfcc87a72309532cceb1442e0591d31549ba8ceee592bb169eb16057f52d1bc7ffe6ba46838f3395774be13ec7f15ba2ea902cdbe315cd95fd07e37e
   languageName: node
   linkType: hard
 
-"react-intl@npm:10.1.12":
-  version: 10.1.12
-  resolution: "react-intl@npm:10.1.12"
+"react-intl@npm:10.1.13":
+  version: 10.1.13
+  resolution: "react-intl@npm:10.1.13"
   dependencies:
     "@formatjs/icu-messageformat-parser": "npm:3.5.11"
     "@formatjs/intl": "npm:4.1.13"
@@ -10587,7 +10605,7 @@ __metadata:
   peerDependencies:
     "@types/react": 19
     react: 19
-  checksum: 10c0/f65704217047b9563ff58f56281157d17d3943de1dc91c24c59a51d1dae68220d9a0bea3787c207c48098ccfb792496a28ad46ed48ebd16794d93cce9e413104
+  checksum: 10c0/bff9029c05793f323c7f7a8940e6fed5f7e9ee41bfc0bcced723013a3494f7dd3b3ad04647896112290fa270bf8027a9e96190adc9ef89dd124284b8d09d79d4
   languageName: node
   linkType: hard
 
