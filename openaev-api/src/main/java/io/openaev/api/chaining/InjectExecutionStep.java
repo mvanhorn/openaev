@@ -47,6 +47,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -170,7 +171,7 @@ public class InjectExecutionStep implements ActionStep {
    * @return the updated step with execution info, or null if execution fails
    */
   @Override
-  @Transactional(rollbackFor = Exception.class)
+  @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
   public Optional<Step> run(Step readyStep) throws ChainingException {
     // CALL BY QUEUE READY
     Inject inject = getInjectFromDataStep(readyStep);
