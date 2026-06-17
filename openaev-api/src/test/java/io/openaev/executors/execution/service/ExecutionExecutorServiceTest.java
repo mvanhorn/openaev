@@ -70,7 +70,7 @@ public class ExecutionExecutorServiceTest {
     ReflectionTestUtils.setField(
         executorService, "connectorInstanceService", connectorInstanceService);
     ReflectionTestUtils.setField(
-        executorService, "executorUtils", new ExecutorUtils(assetAgentJobRepository));
+        executorService, "executorUtils", new ExecutorUtils(assetAgentJobRepository, null));
   }
 
   @Test

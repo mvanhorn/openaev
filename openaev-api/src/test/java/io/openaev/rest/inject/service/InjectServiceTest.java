@@ -143,7 +143,7 @@ class InjectServiceTest {
     ReflectionTestUtils.setField(
         injectService,
         "healthCheckUtils",
-        new HealthCheckUtils(new ExecutorUtils(assetAgentJobRepository)));
+        new HealthCheckUtils(new ExecutorUtils(assetAgentJobRepository, null)));
     ReflectionTestUtils.setField(
         injectService,
         "injectMapper",
@@ -152,7 +152,7 @@ class InjectServiceTest {
             payloadMapper,
             injectExpectationMapper,
             injectUtils,
-            new HealthCheckUtils(new ExecutorUtils(assetAgentJobRepository))));
+            new HealthCheckUtils(new ExecutorUtils(assetAgentJobRepository, null))));
     ReflectionTestUtils.setField(
         injectService, "injectorContractContentUtils", injectorContractContentUtils);
   }
