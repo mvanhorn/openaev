@@ -1,5 +1,6 @@
 package io.openaev.executors.utils;
 
+import io.openaev.context.TenantContext;
 import io.openaev.database.model.Agent;
 import io.openaev.database.model.Endpoint;
 import io.openaev.database.repository.AssetAgentJobRepository;
@@ -64,7 +65,7 @@ public class ExecutorUtils {
         agents.stream().filter(agent -> !agent.isActive()).collect(Collectors.toSet());
     inactiveAgents.forEach(
         agent -> {
-          Endpoint endpoint = endpointService.getEndpoint(agent.getAsset().getId());
+          Endpoint endpoint = endpointService.getEndpoint(agent.getAsset().getId(), TenantContext.getCurrentTenant());
           AtomicBoolean tagRemoved = new AtomicBoolean(false);
           endpoint
               .getTags()
