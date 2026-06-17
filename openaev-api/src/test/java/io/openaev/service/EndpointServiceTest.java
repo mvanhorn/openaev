@@ -223,5 +223,108 @@ class EndpointServiceTest {
           .extracting(Tag::getName)
           .contains("source:crowdstrike", "source:tanium");
     }
+
+    @Test
+    @DisplayName("given endpoint already has same executor tag should not create duplicate")
+    void given_endpointAlreadyHasSameExecutorTag_should_notCreateDuplicate() {
+      // Arrange
+      Executor csExecutor = createExecutor("CrowdStrike", "openaev_crowdstrike");
+      AgentRegisterInput input = createAgentRegisterInput(csExecutor, "cs-device-004");
+
+      Tag existingCsTag = new Tag();
+      existingCsTag.setId(UUID.randomUUID().toString());
+      existingCsTag.setName("source:crowdstrike");
+      existingCsTag.setColor("#FF0000");
+
+      Endpoint existingEndpoint = EndpointFixture.createEndpoint();
+      existingEndpoint.setTags(new HashSet<>(Set.of(existingCsTag)));
+
+      Agent existingAgent = AgentFixture.createAgent(existingEndpoint, "cs-device-004");
+      existingAgent.setExecutor(csExecutor);
+
+      // findByName returns the managed tag from DB
+      when(tagRepository.findByName("source:crowdstrike")).thenReturn(Optional.of(existingCsTag));
+      when(agentService.saveAllAgents(any())).thenAnswer(inv -> inv.getArgument(0));
+
+      // Act
+      endpointService.syncAgentsEndpoints(
+          new ArrayList<>(List.of(input)), List.of(existingAgent), TENANT_ID);
+
+      // Assert — tag still present, no duplicate, no new tag created
+      verify(tagRepository, never()).save(any(Tag.class));
+      ArgumentCaptor<List<Asset>> savedEndpoints = ArgumentCaptor.forClass(List.class);
+      verify(assetService).saveAllAssets(savedEndpoints.capture());
+      Endpoint savedEndpoint = (Endpoint) savedEndpoints.getValue().getFirst();
+      assertThat(savedEndpoint.getTags())
+          .extracting(Tag::getName)
+          .containsOnlyOnce("source:crowdstrike");
+    }
+  }
+
+  @Nested
+  @DisplayName("removeSourceTagFromEndpoint")
+  class RemoveSourceTagFromEndpoint {
+
+    @Test
+    @DisplayName("given endpoint with executor tag should remove only that tag")
+    void given_endpointWithExecutorTag_should_removeOnlyThatTag() {
+      // Arrange
+      Executor csExecutor = new Executor();
+      csExecutor.setName("CrowdStrike");
+
+      Tag csTag = new Tag();
+      csTag.setName("source:crowdstrike");
+      Tag taniumTag = new Tag();
+      taniumTag.setName("source:tanium");
+
+      Endpoint endpoint = EndpointFixture.createEndpoint();
+      endpoint.setTags(new HashSet<>(Set.of(csTag, taniumTag)));
+
+      // Act
+      endpointService.removeSourceTagFromEndpoint(endpoint, csExecutor);
+
+      // Assert — only crowdstrike tag removed, tanium preserved
+      assertThat(endpoint.getTags())
+          .extracting(Tag::getName)
+          .contains("source:tanium")
+          .doesNotContain("source:crowdstrike");
+    }
+
+    @Test
+    @DisplayName("given endpoint without executor tag should not modify tags")
+    void given_endpointWithoutExecutorTag_should_notModifyTags() {
+      // Arrange
+      Executor csExecutor = new Executor();
+      csExecutor.setName("CrowdStrike");
+
+      Tag taniumTag = new Tag();
+      taniumTag.setName("source:tanium");
+
+      Endpoint endpoint = EndpointFixture.createEndpoint();
+      endpoint.setTags(new HashSet<>(Set.of(taniumTag)));
+
+      // Act
+      endpointService.removeSourceTagFromEndpoint(endpoint, csExecutor);
+
+      // Assert — tanium tag still present, nothing changed
+      assertThat(endpoint.getTags()).extracting(Tag::getName).containsExactly("source:tanium");
+    }
+
+    @Test
+    @DisplayName("given endpoint with no tags should not fail")
+    void given_endpointWithNoTags_should_notFail() {
+      // Arrange
+      Executor csExecutor = new Executor();
+      csExecutor.setName("CrowdStrike");
+
+      Endpoint endpoint = EndpointFixture.createEndpoint();
+      endpoint.setTags(null);
+
+      // Act — should not throw
+      endpointService.removeSourceTagFromEndpoint(endpoint, csExecutor);
+
+      // Assert
+      assertThat(endpoint.getTags()).isNull();
+    }
   }
 }

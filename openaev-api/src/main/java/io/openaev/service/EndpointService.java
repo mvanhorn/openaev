@@ -569,14 +569,12 @@ public class EndpointService {
         endpoint.getTags() != null ? new HashSet<>(endpoint.getTags()) : new HashSet<>();
     String tagName = "source:" + executor.getName().toLowerCase();
 
-    // If the endpoint already has this executor's source tag, nothing to do
-    boolean tagExists =
-        existingTags.stream().anyMatch(t -> t.getName() != null && t.getName().equals(tagName));
-    if (tagExists) {
-      return;
-    }
+    // Changed: exact match instead of startsWith("source:") to avoid removing other executors'
+    // tags. An endpoint can have multiple active executors simultaneously.
+    // This prevents duplicates when the same executor syncs again.
+    existingTags.removeIf(t -> t.getName() != null && t.getName().equals(tagName));
 
-    // Tag not present — find or create it, then add to the endpoint
+    // Find or create the tag entity, then add to the endpoint
     Optional<Tag> tag = tagRepository.findByName(tagName);
     if (tag.isEmpty()) {
       Tag newTag = new Tag();
@@ -588,6 +586,27 @@ public class EndpointService {
       existingTags.add(tag.get());
     }
     endpoint.setTags(existingTags);
+  }
+
+  /**
+   * Remove the source tag for a specific executor from an endpoint. Called when an executor becomes
+   * inactive or during startup cleanup of unregistered executors.
+   *
+   * @param endpoint the endpoint to remove the tag from
+   * @param executor the executor whose source tag should be removed
+   */
+  public void removeSourceTagFromEndpoint(Endpoint endpoint, Executor executor) {
+    Set<Tag> existingTags = endpoint.getTags();
+    if (existingTags == null || existingTags.isEmpty()) {
+      return;
+    }
+    String tagName = "source:" + executor.getName().toLowerCase();
+    // Changed: exact match — only removes this executor's tag, preserves other executors' tags
+    boolean removed =
+        existingTags.removeIf(t -> t.getName() != null && t.getName().equals(tagName));
+    if (removed) {
+      endpoint.setTags(existingTags);
+    }
   }
 
   private Agent updateExistingEndpointAndManageAgent(Endpoint endpoint, AgentRegisterInput input) {
