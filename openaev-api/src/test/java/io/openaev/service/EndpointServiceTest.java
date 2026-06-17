@@ -1,4 +1,3 @@
-
 package io.openaev.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -8,11 +7,8 @@ import static org.mockito.Mockito.*;
 import io.openaev.database.model.*;
 import io.openaev.database.repository.*;
 import io.openaev.executors.model.AgentRegisterInput;
-import io.openaev.rest.asset.endpoint.form.EndpointRegisterInput;
 import io.openaev.utils.fixtures.AgentFixture;
-import io.openaev.utils.fixtures.AssetAgentJobFixture;
 import io.openaev.utils.fixtures.EndpointFixture;
-import io.openaev.utils.mapper.EndpointMapper;
 import java.time.Instant;
 import java.util.*;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +19,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.jpa.domain.Specification;
 
 @ExtendWith(MockitoExtension.class)
 class EndpointServiceTest {

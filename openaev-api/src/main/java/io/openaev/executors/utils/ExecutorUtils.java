@@ -4,10 +4,6 @@ import io.openaev.database.model.Agent;
 import io.openaev.database.model.Endpoint;
 import io.openaev.database.repository.AssetAgentJobRepository;
 import io.openaev.service.EndpointService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +13,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -63,19 +60,25 @@ public class ExecutorUtils {
    */
   @Transactional(rollbackFor = Exception.class)
   public Set<Agent> findInactiveAgents(Set<Agent> agents) {
-    Set<Agent> inactiveAgents = agents.stream().filter(agent -> !agent.isActive()).collect(Collectors.toSet());
-    inactiveAgents.forEach(agent -> {
-      Endpoint endpoint = endpointService.getEndpoint(agent.getAsset().getId());
-      AtomicBoolean tagRemoved = new AtomicBoolean(false);
-      endpoint.getTags().removeIf(tag -> {
-        boolean tagPresent = tag.getName().equals("source:" + agent.getExecutor().getName());
-        tagRemoved.set(tagPresent);
-        return tagPresent;
-      });
-      if (tagRemoved.get()) {
-        endpointService.updateEndpoint(endpoint);
-      }
-    });
+    Set<Agent> inactiveAgents =
+        agents.stream().filter(agent -> !agent.isActive()).collect(Collectors.toSet());
+    inactiveAgents.forEach(
+        agent -> {
+          Endpoint endpoint = endpointService.getEndpoint(agent.getAsset().getId());
+          AtomicBoolean tagRemoved = new AtomicBoolean(false);
+          endpoint
+              .getTags()
+              .removeIf(
+                  tag -> {
+                    boolean tagPresent =
+                        tag.getName().equals("source:" + agent.getExecutor().getName());
+                    tagRemoved.set(tagPresent);
+                    return tagPresent;
+                  });
+          if (tagRemoved.get()) {
+            endpointService.updateEndpoint(endpoint);
+          }
+        });
     return inactiveAgents;
   }
 

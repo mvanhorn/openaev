@@ -23,12 +23,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-
-import static io.openaev.helper.StreamHelper.iterableToSet;
-import static io.openaev.utils.StringUtils.generateRandomColor;
-import static java.time.Instant.now;
-
 @RequiredArgsConstructor
 @Service
 public class TagService {
