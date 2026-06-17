@@ -28,60 +28,14 @@ import org.springframework.data.jpa.domain.Specification;
 @ExtendWith(MockitoExtension.class)
 class EndpointServiceTest {
 
-  @Mock private AssetAgentJobRepository assetAgentJobRepository;
+  private static final String TENANT_ID = "tenant-test-id";
+
   @Mock private EndpointRepository endpointRepository;
-  @Mock private ExecutorRepository executorRepository;
-  @Mock private AssetGroupRepository assetGroupRepository;
   @Mock private TagRepository tagRepository;
   @Mock private AgentService agentService;
   @Mock private AssetService assetService;
-  @Mock private EndpointMapper endpointMapper;
 
   @InjectMocks private EndpointService endpointService;
-
-  @Nested
-  @DisplayName("getEndpointJobs")
-  class GetEndpointJobs {
-
-    @Test
-    void given_serviceModeInput_should_returnMatchingJobs() {
-      // Arrange
-      Agent agent = AgentFixture.createDefaultAgentService();
-      AssetAgentJob job = AssetAgentJobFixture.createDefaultAssetAgentJob(agent);
-
-      EndpointRegisterInput input = new EndpointRegisterInput();
-      input.setExternalReference("ref-001");
-      input.setService(true);
-      input.setElevated(true);
-      input.setExecutedByUser(Agent.ADMIN_SYSTEM_WINDOWS);
-
-      when(assetAgentJobRepository.findAll(any(Specification.class))).thenReturn(List.of(job));
-
-      // Act
-      List<AssetAgentJob> result = endpointService.getEndpointJobs(input);
-
-      // Assert
-      assertThat(result).containsExactly(job);
-    }
-
-    @Test
-    void given_noMatchingJobs_should_returnEmptyList() {
-      // Arrange
-      EndpointRegisterInput input = new EndpointRegisterInput();
-      input.setExternalReference("ref-unknown");
-      input.setService(true);
-      input.setElevated(true);
-      input.setExecutedByUser(Agent.ADMIN_SYSTEM_WINDOWS);
-
-      when(assetAgentJobRepository.findAll(any(Specification.class))).thenReturn(List.of());
-
-      // Act
-      List<AssetAgentJob> result = endpointService.getEndpointJobs(input);
-
-      // Assert
-      assertThat(result).isEmpty();
-    }
-  }
 
   @Nested
   @DisplayName("syncAgentsEndpoints - source tag")
@@ -126,10 +80,12 @@ class EndpointServiceTest {
 
       when(tagRepository.findByName("source:crowdstrike")).thenReturn(Optional.empty());
       when(tagRepository.save(any(Tag.class))).thenReturn(sourceTag);
+      when(endpointRepository.findByAtleastOneMacAddress(any(), eq(TENANT_ID)))
+          .thenReturn(List.of());
       when(agentService.saveAllAgents(any())).thenAnswer(inv -> inv.getArgument(0));
 
       // Act
-      endpointService.syncAgentsEndpoints(new ArrayList<>(List.of(input)), List.of());
+      endpointService.syncAgentsEndpoints(new ArrayList<>(List.of(input)), List.of(), TENANT_ID);
 
       // Assert
       ArgumentCaptor<List<Asset>> savedEndpoints = ArgumentCaptor.forClass(List.class);
@@ -162,7 +118,8 @@ class EndpointServiceTest {
       when(agentService.saveAllAgents(any())).thenAnswer(inv -> inv.getArgument(0));
 
       // Act
-      endpointService.syncAgentsEndpoints(new ArrayList<>(List.of(input)), List.of(existingAgent));
+      endpointService.syncAgentsEndpoints(
+          new ArrayList<>(List.of(input)), List.of(existingAgent), TENANT_ID);
 
       // Assert
       ArgumentCaptor<List<Asset>> savedEndpoints = ArgumentCaptor.forClass(List.class);
@@ -190,10 +147,12 @@ class EndpointServiceTest {
                 saved.setId(UUID.randomUUID().toString());
                 return saved;
               });
+      when(endpointRepository.findByAtleastOneMacAddress(any(), eq(TENANT_ID)))
+          .thenReturn(List.of());
       when(agentService.saveAllAgents(any())).thenAnswer(inv -> inv.getArgument(0));
 
       // Act
-      endpointService.syncAgentsEndpoints(new ArrayList<>(List.of(input)), List.of());
+      endpointService.syncAgentsEndpoints(new ArrayList<>(List.of(input)), List.of(), TENANT_ID);
 
       // Assert
       ArgumentCaptor<Tag> tagCaptor = ArgumentCaptor.forClass(Tag.class);
@@ -219,10 +178,12 @@ class EndpointServiceTest {
       existingTag.setColor("#FF0000");
 
       when(tagRepository.findByName("source:crowdstrike")).thenReturn(Optional.of(existingTag));
+      when(endpointRepository.findByAtleastOneMacAddress(any(), eq(TENANT_ID)))
+          .thenReturn(List.of());
       when(agentService.saveAllAgents(any())).thenAnswer(inv -> inv.getArgument(0));
 
       // Act
-      endpointService.syncAgentsEndpoints(new ArrayList<>(List.of(input)), List.of());
+      endpointService.syncAgentsEndpoints(new ArrayList<>(List.of(input)), List.of(), TENANT_ID);
 
       // Assert
       verify(tagRepository, never()).save(any(Tag.class));
@@ -254,7 +215,8 @@ class EndpointServiceTest {
       when(agentService.saveAllAgents(any())).thenAnswer(inv -> inv.getArgument(0));
 
       // Act
-      endpointService.syncAgentsEndpoints(new ArrayList<>(List.of(input)), List.of(existingAgent));
+      endpointService.syncAgentsEndpoints(
+          new ArrayList<>(List.of(input)), List.of(existingAgent), TENANT_ID);
 
       // Assert
       ArgumentCaptor<List<Asset>> savedEndpoints = ArgumentCaptor.forClass(List.class);
