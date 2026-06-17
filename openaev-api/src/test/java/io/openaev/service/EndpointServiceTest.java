@@ -215,7 +215,7 @@ class EndpointServiceTest {
       endpointService.syncAgentsEndpoints(
           new ArrayList<>(List.of(input)), List.of(existingAgent), TENANT_ID);
 
-      // Assert — both source tags must be present (endpoint has multiple active executors)
+      // Assert: both source tags must be present (endpoint has multiple active executors)
       ArgumentCaptor<List<Asset>> savedEndpoints = ArgumentCaptor.forClass(List.class);
       verify(assetService).saveAllAssets(savedEndpoints.capture());
       Endpoint savedEndpoint = (Endpoint) savedEndpoints.getValue().getFirst();
@@ -250,7 +250,7 @@ class EndpointServiceTest {
       endpointService.syncAgentsEndpoints(
           new ArrayList<>(List.of(input)), List.of(existingAgent), TENANT_ID);
 
-      // Assert — tag still present, no duplicate, no new tag created
+      // Assert : tag still present, no duplicate, no new tag created
       verify(tagRepository, never()).save(any(Tag.class));
       ArgumentCaptor<List<Asset>> savedEndpoints = ArgumentCaptor.forClass(List.class);
       verify(assetService).saveAllAssets(savedEndpoints.capture());
@@ -283,7 +283,7 @@ class EndpointServiceTest {
       // Act
       endpointService.removeSourceTagFromEndpoint(endpoint, csExecutor);
 
-      // Assert — only crowdstrike tag removed, tanium preserved
+      // Assert : only crowdstrike tag removed, tanium preserved
       assertThat(endpoint.getTags())
           .extracting(Tag::getName)
           .contains("source:tanium")
@@ -306,7 +306,7 @@ class EndpointServiceTest {
       // Act
       endpointService.removeSourceTagFromEndpoint(endpoint, csExecutor);
 
-      // Assert — tanium tag still present, nothing changed
+      // Assert : tanium tag still present, nothing changed
       assertThat(endpoint.getTags()).extracting(Tag::getName).containsExactly("source:tanium");
     }
 
@@ -320,7 +320,7 @@ class EndpointServiceTest {
       Endpoint endpoint = EndpointFixture.createEndpoint();
       endpoint.setTags(null);
 
-      // Act — should not throw
+      // Act : should not throw
       endpointService.removeSourceTagFromEndpoint(endpoint, csExecutor);
 
       // Assert

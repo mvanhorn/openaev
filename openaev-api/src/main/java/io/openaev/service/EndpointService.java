@@ -569,8 +569,6 @@ public class EndpointService {
         endpoint.getTags() != null ? new HashSet<>(endpoint.getTags()) : new HashSet<>();
     String tagName = "source:" + executor.getName().toLowerCase();
 
-    // Changed: exact match instead of startsWith("source:") to avoid removing other executors'
-    // tags. An endpoint can have multiple active executors simultaneously.
     // This prevents duplicates when the same executor syncs again.
     existingTags.removeIf(t -> t.getName() != null && t.getName().equals(tagName));
 
@@ -601,7 +599,6 @@ public class EndpointService {
       return;
     }
     String tagName = "source:" + executor.getName().toLowerCase();
-    // Changed: exact match — only removes this executor's tag, preserves other executors' tags
     boolean removed =
         existingTags.removeIf(t -> t.getName() != null && t.getName().equals(tagName));
     if (removed) {
