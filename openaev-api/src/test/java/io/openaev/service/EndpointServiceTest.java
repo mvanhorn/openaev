@@ -2,6 +2,7 @@ package io.openaev.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import io.openaev.database.model.*;
@@ -190,37 +191,37 @@ class EndpointServiceTest {
     }
 
     @Test
-    @DisplayName("given endpoint with old source tag should replace with new one")
-    void given_endpointWithOldSourceTag_should_replaceWithNew() {
+    @DisplayName(
+        "given endpoint with another executor source tag should add new tag without removing existing")
+    void given_endpointWithOtherExecutorSourceTag_should_addNewTagAndPreserveExisting() {
       // Arrange
       Executor csExecutor = createExecutor("CrowdStrike", "openaev_crowdstrike");
       AgentRegisterInput input = createAgentRegisterInput(csExecutor, "cs-device-003");
 
       Endpoint existingEndpoint = EndpointFixture.createEndpoint();
-      Tag oldTag = new Tag();
-      oldTag.setName("source:oldexecutor");
-      existingEndpoint.setTags(new HashSet<>(Set.of(oldTag)));
+      Tag otherExecutorTag = new Tag();
+      otherExecutorTag.setName("source:tanium");
+      existingEndpoint.setTags(new HashSet<>(Set.of(otherExecutorTag)));
 
       Agent existingAgent = AgentFixture.createAgent(existingEndpoint, "cs-device-003");
       existingAgent.setExecutor(csExecutor);
 
-      Tag newTag = new Tag();
-      newTag.setName("source:crowdstrike");
-      when(tagRepository.findByName("source:crowdstrike")).thenReturn(Optional.of(newTag));
+      Tag csTag = new Tag();
+      csTag.setName("source:crowdstrike");
+      when(tagRepository.findByName("source:crowdstrike")).thenReturn(Optional.of(csTag));
       when(agentService.saveAllAgents(any())).thenAnswer(inv -> inv.getArgument(0));
 
       // Act
       endpointService.syncAgentsEndpoints(
           new ArrayList<>(List.of(input)), List.of(existingAgent), TENANT_ID);
 
-      // Assert
+      // Assert — both source tags must be present (endpoint has multiple active executors)
       ArgumentCaptor<List<Asset>> savedEndpoints = ArgumentCaptor.forClass(List.class);
       verify(assetService).saveAllAssets(savedEndpoints.capture());
       Endpoint savedEndpoint = (Endpoint) savedEndpoints.getValue().getFirst();
       assertThat(savedEndpoint.getTags())
           .extracting(Tag::getName)
-          .contains("source:crowdstrike")
-          .doesNotContain("source:oldexecutor");
+          .contains("source:crowdstrike", "source:tanium");
     }
   }
 }

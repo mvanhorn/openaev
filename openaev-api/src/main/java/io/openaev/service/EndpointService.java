@@ -567,24 +567,27 @@ public class EndpointService {
   private void addSourceTagToEndpoint(Endpoint endpoint, Executor executor) {
     Set<Tag> existingTags =
         endpoint.getTags() != null ? new HashSet<>(endpoint.getTags()) : new HashSet<>();
-    boolean tagExists =
-        existingTags.stream()
-            .anyMatch(t -> t.getName().equals("source:" + executor.getName().toLowerCase()));
+    String tagName = "source:" + executor.getName().toLowerCase();
 
-    if (!tagExists) {
-      String tagName = "source:" + executor.getName().toLowerCase();
-      Optional<Tag> tag = tagRepository.findByName(tagName);
-      if (tag.isEmpty()) {
-        Tag newTag = new Tag();
-        newTag.setColor(executor.getBackgroundColor());
-        newTag.setName(tagName);
-        tagRepository.save(newTag);
-        existingTags.add(newTag);
-      } else {
-        existingTags.add(tag.get());
-      }
-      endpoint.setTags(existingTags);
+    // If the endpoint already has this executor's source tag, nothing to do
+    boolean tagExists =
+        existingTags.stream().anyMatch(t -> t.getName() != null && t.getName().equals(tagName));
+    if (tagExists) {
+      return;
     }
+
+    // Tag not present — find or create it, then add to the endpoint
+    Optional<Tag> tag = tagRepository.findByName(tagName);
+    if (tag.isEmpty()) {
+      Tag newTag = new Tag();
+      newTag.setColor(executor.getBackgroundColor());
+      newTag.setName(tagName);
+      tagRepository.save(newTag);
+      existingTags.add(newTag);
+    } else {
+      existingTags.add(tag.get());
+    }
+    endpoint.setTags(existingTags);
   }
 
   private Agent updateExistingEndpointAndManageAgent(Endpoint endpoint, AgentRegisterInput input) {
