@@ -21,7 +21,6 @@ import io.openaev.utils.fixtures.composers.CatalogConnectorComposer;
 import io.openaev.utils.fixtures.composers.CatalogConnectorConfigurationComposer;
 import io.openaev.utils.fixtures.composers.ConnectorInstanceComposer;
 import io.openaev.utils.mockUser.WithMockUser;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -44,7 +43,6 @@ public class CatalogConnectorApiTest extends IntegrationTest {
   @Autowired private CatalogConnectorConfigurationComposer catalogConfigurationComposer;
   @Autowired private TenantIsolationTestHelper tenantIsolationTestHelper;
   @Autowired private FileService fileService;
-  @Autowired private EntityManager entityManager;
 
   @Test
   @DisplayName(
