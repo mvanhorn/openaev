@@ -65,7 +65,9 @@ public class ExecutorUtils {
         agents.stream().filter(agent -> !agent.isActive()).collect(Collectors.toSet());
     inactiveAgents.forEach(
         agent -> {
-          Endpoint endpoint = endpointService.getEndpoint(agent.getAsset().getId(), TenantContext.getCurrentTenant());
+          Endpoint endpoint =
+              endpointService.getEndpoint(
+                  agent.getAsset().getId(), TenantContext.getCurrentTenant());
           AtomicBoolean tagRemoved = new AtomicBoolean(false);
           endpoint
               .getTags()
